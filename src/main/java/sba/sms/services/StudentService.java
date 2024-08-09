@@ -26,14 +26,13 @@ import java.util.List;
 
 public class StudentService implements StudentI{
 
-    SessionFactory factory = null;
+    SessionFactory factory = new Configuration().configure().buildSessionFactory();;
     Session session = null;
     Transaction transaction = null;
 
     @Override
     public List<Student> getAllStudents() {
         try{
-            factory = new Configuration().configure().buildSessionFactory();
             session = factory.openSession();
             transaction = session.beginTransaction();
 
@@ -52,7 +51,6 @@ public class StudentService implements StudentI{
             }
             e.printStackTrace();
         }finally {
-            factory.close();
             session.close();
         }
 
@@ -62,7 +60,6 @@ public class StudentService implements StudentI{
     @Override
     public void createStudent(Student student) {
         try{
-            factory = new Configuration().configure().buildSessionFactory();
             session = factory.openSession();
             transaction = session.beginTransaction();
 
@@ -76,7 +73,6 @@ public class StudentService implements StudentI{
             }
             e.printStackTrace();
         }finally {
-            factory.close();
             session.close();
         }
     }
@@ -85,7 +81,6 @@ public class StudentService implements StudentI{
     public Student getStudentByEmail(String email) {
 
         try{
-            factory = new Configuration().configure().buildSessionFactory();
             session = factory.openSession();
             transaction = session.beginTransaction();
 
@@ -108,16 +103,66 @@ public class StudentService implements StudentI{
 
     @Override
     public boolean validateStudent(String email, String password) {
-        return false;
+        try{
+            session = factory.openSession();
+            transaction = session.beginTransaction();
+
+            String hql = "FROM student s WHERE s.email = :email AND s" +
+                    ".password = :password";
+            TypedQuery<Student> query = session.createQuery(hql,
+                    Student.class);
+            query.setParameter("email", email);
+            query.setParameter("password", password);
+
+            Student student = query.getSingleResult();
+
+            transaction.commit();
+
+            return student != null;
+
+        }catch (Exception e){
+            if(transaction != null){
+                transaction.rollback();
+            }
+            e.printStackTrace();
+        }
+            return false;
     }
 
     @Override
     public void registerStudentToCourse(String email, int courseId) {
+        try{
+            session = factory.openSession();
+            transaction = session.beginTransaction();
 
+            Student student = getStudentByEmail(email);
+            CourseService service = new CourseService();
+            Course course = service.getCourseById(courseId);
+
+            student.getCourses().add(course);
+
+            session.merge(student);
+            transaction.commit();
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }finally {
+            session.close();
+        }
     }
 
     @Override
     public List<Course> getStudentCourses(String email) {
-        return List.of();
+        try{
+            Student student = getStudentByEmail(email);
+
+            List<Course> courses = new ArrayList<>();
+            courses.addAll(student.getCourses());
+            return courses;
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+        return null;
     }
 }

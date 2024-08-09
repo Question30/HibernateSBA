@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -20,6 +21,7 @@ import java.util.Set;
 @Entity
 @Table(name = "student")
 @Data
+@RequiredArgsConstructor()
 public class Student {
         @Id
         @Column(name = "email", length = 50)
@@ -38,10 +40,14 @@ public class Student {
                 joinColumns = {@JoinColumn(name = "email")},
                 inverseJoinColumns = {@JoinColumn(name = "courses_id")}
         )
-        private Set<Course> courses;
+        private Set<Course> courses = new HashSet<>();
 
-
-    }
+        public Student(String email, String name, String password) {
+                this.email = email;
+                this.name = name;
+                this.password = password;
+        }
+}
 
 
 
