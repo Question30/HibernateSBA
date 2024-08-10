@@ -1,10 +1,11 @@
 package sba.sms.models;
 
 import jakarta.persistence.*;
-import lombok.*;
-import lombok.experimental.FieldDefaults;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import java.util.LinkedHashSet;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
@@ -18,6 +19,8 @@ import java.util.Set;
 @Data
 @Entity
 @Table(name = "course ")
+@AllArgsConstructor
+@NoArgsConstructor
 public class Course {
 
     @Id
@@ -32,15 +35,25 @@ public class Course {
     private String instructor;
 
     @Column(name = "students")
-    private Set<Student> students;
+    @ManyToMany(mappedBy = "courses", fetch = FetchType.EAGER, cascade = {CascadeType.DETACH, CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.MERGE})
+    private Set<Student> students = new HashSet<>();
 
-    @ManyToMany(mappedBy = "course")
-    public Set<Student> getStudents() {
-        return students;
-    }
 
     public Course(String name, String instructor) {
         this.name = name;
         this.instructor = instructor;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Course course = (Course) o;
+        return id == course.id && Objects.equals(name, course.name) && Objects.equals(instructor, course.instructor);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, instructor);
     }
 }
