@@ -24,8 +24,6 @@ import static org.junit.Assert.assertTrue;
 
 class StudentServiceTest {
 
-    private StudentService service = new StudentService();
-
     private static Session session;
 
     @BeforeAll
