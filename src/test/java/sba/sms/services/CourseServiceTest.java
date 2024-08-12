@@ -1,6 +1,7 @@
 package sba.sms.services;
 
 import org.hibernate.Session;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import sba.sms.models.Course;
@@ -43,7 +44,7 @@ public class CourseServiceTest {
     }
 
     @Test
-    public void testGetAllCourses(){
+    public void testGetAllCourses() {
         session.beginTransaction();
         Course course = new Course("JAVA", "Steven Hulse");
         session.persist(course);
@@ -51,7 +52,10 @@ public class CourseServiceTest {
                 Course.class).getResultList();
         session.getTransaction().commit();
         System.out.println(courses);
-        assertTrue("huh",!courses.isEmpty());
+        assertTrue("huh", !courses.isEmpty());
     }
-}
 
+
+    @AfterAll
+    public static void shutDown(){if(session != null) session.close();}
+}
