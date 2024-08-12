@@ -116,7 +116,6 @@ public class StudentService implements StudentI{
 
             Student student = getStudentByEmail(email);
             Course course = service.getCourseById(courseId);
-            System.out.println(course);
 
             student.getCourses().addAll(getStudentCourses(email));
             student.getCourses().add(course);
@@ -142,13 +141,14 @@ public class StudentService implements StudentI{
             transaction = session.beginTransaction();
 
             String sql = "SELECT course.courses_id, course_name, instructor_name" +
-                    " FROM course INNER JOIN student_courses ON course.courses_id = student_courses.courses_id WHERE student_courses.student_email = :email";
+                    " FROM course INNER JOIN student_courses ON course.courses_id = student_courses.courses_id WHERE student_email = :email";
 
             NativeQuery<Course> query = session.createNativeQuery(sql, Course.class);
             query.setParameter("email", email);
 
             courses = query.getResultList();
 
+            transaction.commit();
         }catch (Exception e){
             e.printStackTrace();
         }finally {
