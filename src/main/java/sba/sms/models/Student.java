@@ -1,7 +1,9 @@
 package sba.sms.models;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 
 import java.util.HashSet;
@@ -20,7 +22,8 @@ import java.util.Set;
 @Entity
 @Table(name = "student")
 @Data
-@RequiredArgsConstructor()
+@RequiredArgsConstructor
+@AllArgsConstructor
 public class Student {
         @Id
         @Column(name = "email", length = 50, nullable = false)
@@ -45,6 +48,11 @@ public class Student {
                 this.email = email;
                 this.name = name;
                 this.password = password;
+        }
+
+        public void addCourse(Course course){
+                courses.add(course);
+                course.getStudents().add(this);
         }
 
         @Override

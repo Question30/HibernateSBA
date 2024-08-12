@@ -117,8 +117,7 @@ public class StudentService implements StudentI{
             Student student = getStudentByEmail(email);
             Course course = service.getCourseById(courseId);
 
-            student.getCourses().addAll(getStudentCourses(email));
-            student.getCourses().add(course);
+            student.addCourse(course);
 
             session.merge(student);
             transaction.commit();
